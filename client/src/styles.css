@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+:root[data-theme='dark'] {
+  --page: 14 16 20;
+  --surface: 21 24 31;
+  --line: 38 42 51;
+  --ink: 236 237 238;
+  --muted: 156 163 175;
+  --accent: 132 165 255;
+  --on-accent: 14 16 20;
+  --good: 74 196 135;
+  --warn: 232 178 82;
+  --bad: 240 113 103;
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --page: 255 255 255;
+  --surface: 247 248 250;
+  --line: 226 229 234;
+  --ink: 21 23 28;
+  --muted: 88 96 110;
+  --accent: 46 84 204;
+  --on-accent: 255 255 255;
+  --good: 22 133 78;
+  --warn: 166 104 0;
+  --bad: 196 50 40;
+  color-scheme: light;
+}
+
+@layer base {
+  body {
+    @apply bg-page text-ink font-sans antialiased;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  ::selection {
+    background: rgb(var(--accent) / 0.3);
+  }
+  a,
+  button,
+  input,
+  textarea,
+  select {
+    @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-full border border-line bg-surface px-4 py-2 text-sm font-medium text-ink transition-colors hover:border-muted/60 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply border-accent bg-accent text-on-accent hover:bg-accent/90;
+  }
+  .field {
+    @apply w-full rounded-lg border border-line bg-page px-3 py-2 text-ink placeholder:text-muted/70 focus:border-accent focus:outline-none;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-ink;
+  }
+  .card {
+    @apply rounded-xl border border-line bg-surface;
+  }
+}

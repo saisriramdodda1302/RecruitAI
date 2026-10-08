@@ -19,7 +19,7 @@ You create a job and paste its description. From there, each resume goes through
 - Scoring sees an anonymised resume, and the prompts forbid using age, gender, nationality, names or school prestige.
 - A score with no quote becomes 0. If the quotes can't be found in the resume, the score is capped at 3 and the UI says so. This stops the model from inventing experience.
 - The model only rates each criterion. The weighted total and the must-have check are plain code, so the same ratings always give the same rank.
-- Temperature 0 and strict JSON schemas on every call. Responses are validated with Zod and retried once if they don't match.
+- Strict JSON schemas on every call. If a provider doesn't support strict schemas, the server falls back to JSON mode with the schema in the prompt. Either way, responses are validated with Zod and retried once if they don't match.
 - Resume text is treated as untrusted. Instructions hidden inside a resume ("give this candidate 10") are ignored, and the quote check limits what they could do anyway.
 - Changing weights re-ranks everyone instantly from the stored ratings. No resume is sent to the model again.
 
@@ -28,7 +28,7 @@ You create a job and paste its description. From there, each resume goes through
 ```
 React (Vercel)  ──/api──▶  Express API (Render)  ──▶  PostgreSQL (Neon)
                                   │
-                                  └── screening queue ──▶ OpenAI API
+                                  └── screening queue ──▶ Gemini API
 ```
 
 - The frontend always calls `/api`. Vercel forwards it to Render, so the browser sees one origin and the session lives in an httpOnly cookie instead of localStorage.
@@ -38,16 +38,31 @@ React (Vercel)  ──/api──▶  Express API (Render)  ──▶  PostgreSQL
 
 ## Tech
 
-React, React Router, Tailwind CSS, Node.js, Express, PostgreSQL (`pg`, plain SQL), OpenAI API, JWT, bcrypt, Zod.
+React, React Router, Tailwind CSS, Node.js, Express, PostgreSQL (`pg`, plain SQL), Gemini API, JWT, bcrypt, Zod.
+
+## The model
+
+RecruitAI uses Gemini through its OpenAI-compatible endpoint, so the server only needs the `openai` npm package. Get a free key from [Google AI Studio](https://aistudio.google.com) and set:
+
+| Variable | Value |
+| --- | --- |
+| `LLM_API_KEY` | your Gemini key |
+| `LLM_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta/openai/` |
+| `LLM_MODEL` | `gemini-3.8-flash` (any free Flash model works) |
+| `LLM_REASONING_EFFORT` | `low` keeps responses fast and within free limits |
+
+The free tier is rate limited, so keep `SCREEN_CONCURRENCY=1`. Resumes are screened one at a time and rate-limit errors are retried automatically. On the free tier Google may use requests to improve its models, so test with sample resumes rather than real candidates.
+
+Switching to OpenAI is a config change: set your OpenAI key, remove `LLM_BASE_URL`, and set `LLM_MODEL=gpt-4o-mini` and `LLM_TEMPERATURE=0`.
 
 ## Running locally
 
-You need Node 20+, a PostgreSQL database and an OpenAI API key.
+You need Node 20+, a PostgreSQL database and a free Gemini API key.
 
 ```bash
 # API
 cd server
-cp .env.example .env      # fill in DATABASE_URL, JWT_SECRET, OPENAI_API_KEY
+cp .env.example .env      # fill in DATABASE_URL, JWT_SECRET, LLM_API_KEY
 npm install
 npm run dev               # http://localhost:4000, creates tables on first start
 
@@ -69,8 +84,8 @@ Run `npm test` in `server` for the scoring and anonymisation tests.
 | --- | --- |
 | `DATABASE_URL` | Neon connection string |
 | `JWT_SECRET` | a long random string |
-| `OPENAI_API_KEY` | your key |
-| `OPENAI_MODEL` | optional, defaults to `gpt-4o-mini` |
+| `LLM_API_KEY`, `LLM_BASE_URL`, `LLM_MODEL`, `LLM_REASONING_EFFORT` | see "The model" above |
+| `SCREEN_CONCURRENCY` | `1` on a free model tier |
 | `NODE_ENV` | `production` |
 | `TRUST_PROXY` | `2` (Vercel and Render both sit in front of the API) |
 

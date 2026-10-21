@@ -5,7 +5,7 @@ const WEEK = 7 * 24 * 60 * 60 * 1000;
 
 const cookieOpts = () => ({
   httpOnly: true,
-  sameSite: 'lax',
+  sameSite: 'lax', //among 3 levels, lax, Strict, None(I chose lax bcoz, it has balanced level of sec).
   secure: process.env.NODE_ENV === 'production',
   path: '/',
 });

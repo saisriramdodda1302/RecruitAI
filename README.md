@@ -1,14 +1,14 @@
 # RecruitAI
 
-RecruitAI screens resumes against a job description and gives you a ranked shortlist. Every score comes with the criterion it belongs to, a one-line reason, and quotes from the resume that back it up.
+RecruitAI screens resumes against a job description and gives us a ranked shortlist. Every score comes with the criterion it belongs to, a one-line reason, and quotes from the resume that back it up.
 
 It started as a team project. This repository is my rebuild of it.
 
 ## How it works
 
-You create a job and paste its description. From there, each resume goes through the same four steps.
+We create a job and paste its description. From there, each resume goes through the same four steps.
 
-1. **Rubric.** The job description is turned into 4 to 7 criteria, each with a weight from 1 to 5 and a must-have flag. This happens once per job, so every candidate is judged against the same yardstick. You can change weights and must-haves later.
+1. **Rubric.** The job description is turned into 4 to 7 criteria, each with a weight from 1 to 5 and a must-have flag. This happens once per job, so every candidate is judged against the same yardstick. We can change weights and must-haves later.
 2. **Profile.** The resume is parsed (PDF, DOCX or TXT) and the model pulls out structured facts: experience, skills, education, contact details.
 3. **Blind review.** Name, email, phone and links are stripped from the resume. The model then scores each criterion from 0 to 10 against a fixed scale and has to quote the resume for every score.
 4. **Ranking.** The server checks every quote against the resume text and computes the final score itself, out of 100. Candidates who meet all must-haves are ranked first.
@@ -46,18 +46,18 @@ RecruitAI uses Gemini through its OpenAI-compatible endpoint, so the server only
 
 | Variable | Value |
 | --- | --- |
-| `LLM_API_KEY` | your Gemini key |
+| `LLM_API_KEY` | our Gemini key |
 | `LLM_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta/openai/` |
 | `LLM_MODEL` | `gemini-3.8-flash` (any free Flash model works) |
 | `LLM_REASONING_EFFORT` | `low` keeps responses fast and within free limits |
 
 The free tier is rate limited, so keep `SCREEN_CONCURRENCY=1`. Resumes are screened one at a time and rate-limit errors are retried automatically. On the free tier Google may use requests to improve its models, so test with sample resumes rather than real candidates.
 
-Switching to OpenAI is a config change: set your OpenAI key, remove `LLM_BASE_URL`, and set `LLM_MODEL=gpt-4o-mini` and `LLM_TEMPERATURE=0`.
+Switching to OpenAI is a config change: set our OpenAI key, remove `LLM_BASE_URL`, and set `LLM_MODEL=gpt-4o-mini` and `LLM_TEMPERATURE=0`.
 
 ## Running locally
 
-You need Node 20+, a PostgreSQL database and a free Gemini API key.
+We need Node 20+, a PostgreSQL database and a free Gemini API key.
 
 ```bash
 # API
@@ -89,7 +89,7 @@ Run `npm test` in `server` for the scoring and anonymisation tests.
 | `NODE_ENV` | `production` |
 | `TRUST_PROXY` | `2` (Vercel and Render both sit in front of the API) |
 
-**Web app (Vercel).** Import the repo with root directory `client` (Vite is detected). Then open `client/vercel.json` and replace `YOUR-RENDER-SERVICE` with your Render URL before deploying.
+**Web app (Vercel).** Import the repo with root directory `client` (Vite is detected). Then open `client/vercel.json` and replace `OUR-RENDER-SERVICE` with our Render URL before deploying.
 
 ## API
 

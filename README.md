@@ -46,7 +46,11 @@ RecruitAI uses Gemini through its OpenAI-compatible endpoint, so the server only
 
 | Variable | Value |
 | --- | --- |
+<<<<<<< Updated upstream
 | `LLM_API_KEY` | our Gemini key |
+=======
+| `LLM_API_KEY` | Gemini key |
+>>>>>>> Stashed changes
 | `LLM_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta/openai/` |
 | `LLM_MODEL` | `gemini-3.8-flash` (any free Flash model works) |
 | `LLM_REASONING_EFFORT` | `low` keeps responses fast and within free limits |
@@ -73,6 +77,28 @@ npm run dev               # http://localhost:5173, proxies /api to :4000
 ```
 
 Run `npm test` in `server` for the scoring and anonymisation tests.
+
+## Running with Docker
+
+The whole stack (Postgres, the API, and the web app behind nginx) starts with one command. You only need Docker Desktop and a Gemini key.
+
+```bash
+cp server/.env.example server/.env    # set JWT_SECRET and LLM_API_KEY
+docker compose up --build
+```
+
+Then open http://localhost:8080. The first build takes a few minutes; later starts are quick.
+
+- `db` is Postgres 17. Data lives in the `pgdata` volume, so it survives restarts. It's also published on port 5433 if you want to look inside with psql or a GUI.
+- `api` is the Express server. Compose points `DATABASE_URL` at the `db` container, so the value in `.env` is ignored here. It starts once Postgres is healthy and creates the tables on boot.
+- `web` builds the React app and serves it with nginx, which forwards `/api` to the API the same way Vercel does in production. The browser sees one origin, so the session cookie just works.
+
+```bash
+docker compose logs -f api     # watch screening as it happens
+docker compose ps              # status and health of each container
+docker compose down            # stop everything
+docker compose down -v         # stop and wipe the database
+```
 
 ## Deploying
 
@@ -108,8 +134,11 @@ Run `npm test` in `server` for the scoring and anonymisation tests.
 ## Layout
 
 ```
+docker-compose.yml  db + api + web for local runs
 client/   React app (pages, components, small api client)
+  Dockerfile, nginx.conf
 server/
+  Dockerfile
   src/routes/      auth, jobs, candidates
   src/lib/         parse.js, prompts.js, llm.js, screen.js, score.js, queue.js
   src/schema.sql   tables and indexes

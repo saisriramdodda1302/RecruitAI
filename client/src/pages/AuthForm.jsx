@@ -1,3 +1,5 @@
+//signup(register/login).
+// this -> uses lib's api to send reqst and then sets user after response from backend(lib/auth.js) in frontend lib -> then in backend routes/auth.js startSession()(startsession rerturning httponly cookie containing signed jwt).
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
@@ -20,7 +22,7 @@ export default function AuthForm({ mode }) {
     setBusy(true);
     setError('');
     try {
-      const body = isNew ? form : { email: form.email, password: form.password };
+      const body = isNew ? form : { email: form.email, password: form.password };//register or login.
       setUser(await api(`/auth/${isNew ? 'register' : 'login'}`, { method: 'POST', body }));
     } catch (err) {
       setError(err.message);

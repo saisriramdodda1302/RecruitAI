@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: recruitai-api
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "2"
+      - key: DATABASE_URL
+        sync: false
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_BASE_URL
+        value: https://generativelanguage.googleapis.com/v1beta/openai/
+      - key: LLM_MODEL
+        value: gemini-3.8-flash
+      - key: LLM_REASONING_EFFORT
+        value: low
+      - key: SCREEN_CONCURRENCY
+        value: "1"
+      - key: JWT_SECRET
+        generateValue: true
